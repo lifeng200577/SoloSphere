@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>植物大战僵尸 - SoloSphere</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 80px;
+        }
+
+        #gameCanvas {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #357abd;
+        }
+
+        .score-display {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .plant-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .plant-option {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .plant-option:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .plant-option.selected {
+            background: #4a90e2;
+        }
+
+        .plant-option img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .sun-counter {
+            color: white;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .sun-counter img {
+            width: 30px;
+            height: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sun-counter">
+        <img src="sun.svg" alt="阳光">
+        <span id="sunCount">50</span>
+    </div>
+
+    <div class="plant-selector">
+        <div class="plant-option" data-plant="sunflower" data-cost="50">
+            <img src="sunflower.svg" alt="向日葵">
+        </div>
+        <div class="plant-option" data-plant="peashooter" data-cost="100">
+            <img src="plant.svg" alt="豌豆射手">
+        </div>
+        <div class="plant-option" data-plant="lawnmower" data-cost="150">
+            <img src="lawnmower.svg" alt="割草机">
+        </div>
+    </div>
+
+    <canvas id="gameCanvas" width="800" height="480"></canvas>
+
+    <div class="game-controls">
+        <button id="startButton">开始游戏</button>
+        <button id="pauseButton">暂停</button>
+        <button id="restartButton">重新开始</button>
+    </div>
+
+    <a href="/" style="
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        padding: 12px 25px;
+        border-radius: 25px;
+        color: white;
+        text-decoration: none;
+        font-size: 1.1em;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;">
+        返回首页
+    </a>
+
+    <script src="../nav.js"></script>
+    <script src="pvz.js"></script>
+    <script>
+        window.onload = function() {
+            initNav();
+            initGame();
+        };
+    </script>
+</body>
+</html> 

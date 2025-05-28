@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生活 - SoloSphere</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: white;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .card-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .add-button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+
+        .add-button:hover {
+            background: #357abd;
+        }
+
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .task-checkbox {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: transparent;
+            transition: all 0.3s;
+        }
+
+        .task-checkbox.checked {
+            background: #4a90e2;
+            border-color: #4a90e2;
+            color: white;
+        }
+
+        .task-content {
+            flex-grow: 1;
+        }
+
+        .task-content.completed {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .task-date {
+            font-size: 0.8em;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .task-button {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            font-size: 0.9em;
+            padding: 5px;
+        }
+
+        .task-button:hover {
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            color: #333;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #4a90e2;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .modal-button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .save-button {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .cancel-button {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .progress-section {
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .progress {
+            height: 100%;
+            background: #4a90e2;
+            border-radius: 5px;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" style="
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 12px 25px;
+            border-radius: 25px;
+            color: white;
+            text-decoration: none;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;">
+            返回首页
+        </a>
+        
+        <div class="grid">
+            <div class="card">
+                <div class="card-title">
+                    <span>今日待办</span>
+                    <button class="add-button" onclick="showAddTaskModal('today')">添加任务</button>
+                </div>
+                <ul class="task-list" id="todayTasks">
+                    <li class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)">✓</div>
+                        <div class="task-content">完成项目报告</div>
+                        <div class="task-actions">
+                            <button class="task-button">编辑</button>
+                            <button class="task-button">删除</button>
+                        </div>
+                    </li>
+                    <li class="task-item">
+                        <div class="task-checkbox checked" onclick="toggleTask(this)">✓</div>
+                        <div class="task-content completed">参加晨会</div>
+                        <div class="task-actions">
+                            <button class="task-button">编辑</button>
+                            <button class="task-button">删除</button>
+                        </div>
+                    </li>
+                </ul>
+                <div class="progress-section">
+                    <div>完成进度：2/5</div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 40%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span>本周计划</span>
+                    <button class="add-button" onclick="showAddTaskModal('week')">添加任务</button>
+                </div>
+                <ul class="task-list" id="weekTasks">
+                    <li class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)">✓</div>
+                        <div class="task-content">准备周末演讲</div>
+                        <div class="task-date">周五截止</div>
+                        <div class="task-actions">
+                            <button class="task-button">编辑</button>
+                            <button class="task-button">删除</button>
+                        </div>
+                    </li>
+                    <li class="task-item">
+                        <div class="task-checkbox checked" onclick="toggleTask(this)">✓</div>
+                        <div class="task-content completed">完成代码审查</div>
+                        <div class="task-date">周三截止</div>
+                        <div class="task-actions">
+                            <button class="task-button">编辑</button>
+                            <button class="task-button">删除</button>
+                        </div>
+                    </li>
+                </ul>
+                <div class="progress-section">
+                    <div>完成进度：3/6</div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 50%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span>长期目标</span>
+                    <button class="add-button" onclick="showAddTaskModal('goals')">添加目标</button>
+                </div>
+                <ul class="task-list" id="goalsList">
+                    <li class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)">✓</div>
+                        <div class="task-content">学习Python编程</div>
+                        <div class="task-date">6月底完成</div>
+                        <div class="task-actions">
+                            <button class="task-button">编辑</button>
+                            <button class="task-button">删除</button>
+                        </div>
+                    </li>
+                    <li class="task-item">
+                        <div class="task-checkbox" onclick="toggleTask(this)">✓</div>
+                        <div class="task-content">健身计划</div>
+                        <div class="task-date">持续进行</div>
+                        <div class="task-actions">
+                            <button class="task-button">编辑</button>
+                            <button class="task-button">删除</button>
+                        </div>
+                    </li>
+                </ul>
+                <div class="progress-section">
+                    <div>完成进度：1/4</div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 25%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="addTaskModal">
+        <div class="modal-content">
+            <h2 class="modal-title">添加新任务</h2>
+            <div class="form-group">
+                <label>任务名称</label>
+                <input type="text" id="taskName" placeholder="请输入任务名称">
+            </div>
+            <div class="form-group">
+                <label>截止日期</label>
+                <input type="date" id="taskDate">
+            </div>
+            <div class="form-group">
+                <label>任务描述</label>
+                <textarea id="taskDescription" placeholder="请输入任务描述"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-button cancel-button" onclick="hideAddTaskModal()">取消</button>
+                <button class="modal-button save-button" onclick="saveTask()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="nav.js"></script>
+    <script>
+        window.onload = function() {
+            initNav();
+        };
+
+        function toggleTask(checkbox) {
+            checkbox.classList.toggle('checked');
+            const content = checkbox.nextElementSibling;
+            content.classList.toggle('completed');
+        }
+
+        function showAddTaskModal(type) {
+            document.getElementById('addTaskModal').style.display = 'flex';
+        }
+
+        function hideAddTaskModal() {
+            document.getElementById('addTaskModal').style.display = 'none';
+        }
+
+        function saveTask() {
+            const taskName = document.getElementById('taskName').value;
+            const taskDate = document.getElementById('taskDate').value;
+            const taskDescription = document.getElementById('taskDescription').value;
+            
+            if (!taskName) {
+                alert('请输入任务名称');
+                return;
+            }
+
+            // 这里添加保存任务的逻辑
+            
+            hideAddTaskModal();
+            alert('任务添加成功！');
+            location.reload();
+        }
+    </script>
+</body>
+</html> 

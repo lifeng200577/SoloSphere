@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客 - SoloSphere</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 80px;
+        }
+
+        .blog-post {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .blog-title {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .blog-meta {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+
+        .blog-content {
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .add-post-form {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .form-group textarea {
+            height: 200px;
+            resize: vertical;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #357abd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="add-post-form">
+            <h2>写博客</h2>
+            <form id="addPostForm">
+                <div class="form-group">
+                    <label for="title">标题</label>
+                    <input type="text" id="title" required placeholder="输入博客标题">
+                </div>
+                <div class="form-group">
+                    <label for="content">内容</label>
+                    <textarea id="content" required placeholder="写下你的想法..."></textarea>
+                </div>
+                <button type="submit">发布</button>
+            </form>
+        </div>
+
+        <div id="blogPosts">
+            <!-- 博客文章将通过JavaScript动态加载 -->
+        </div>
+    </div>
+
+    <script src="/nav.js"></script>
+    <script>
+        // 初始化导航栏
+        window.onload = function() {
+            initNav();
+            loadBlogPosts();
+        };
+
+        // 加载博客文章
+        function loadBlogPosts() {
+            fetch('/api/blog/posts')
+                .then(response => response.json())
+                .then(data => {
+                    const blogPosts = document.getElementById('blogPosts');
+                    blogPosts.innerHTML = '';
+                    
+                    data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                        .forEach(post => {
+                            const postElement = document.createElement('div');
+                            postElement.className = 'blog-post';
+                            postElement.innerHTML = `
+                                <div class="blog-title">${post.title}</div>
+                                <div class="blog-meta">${new Date(post.created_at).toLocaleString()}</div>
+                                <div class="blog-content">${post.content}</div>
+                            `;
+                            blogPosts.appendChild(postElement);
+                        });
+                })
+                .catch(error => console.error('加载博客文章失败:', error));
+        }
+
+        // 添加博客文章
+        document.getElementById('addPostForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const postData = {
+                title: document.getElementById('title').value,
+                content: document.getElementById('content').value
+            };
+
+            fetch('/api/blog/posts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.id) {
+                    loadBlogPosts();
+                    document.getElementById('addPostForm').reset();
+                }
+            })
+            .catch(error => console.error('发布博客文章失败:', error));
+        });
+    </script>
+</body>
+</html> 

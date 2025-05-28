@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐 - SoloSphere</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            color: white;
+        }
+
+        .music-player {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .now-playing {
+            margin-bottom: 20px;
+        }
+
+        .song-title {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .artist {
+            font-size: 1.2em;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .control-button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .control-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .play-button {
+            background: #4a90e2;
+            font-size: 32px;
+        }
+
+        .play-button:hover {
+            background: #357abd;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .progress {
+            width: 30%;
+            height: 100%;
+            background: #4a90e2;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .time {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .playlist {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .playlist-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .song-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .song-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .song-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .song-info {
+            flex-grow: 1;
+        }
+
+        .song-name {
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .song-artist {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .song-duration {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .volume-slider {
+            flex-grow: 1;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .volume-level {
+            width: 70%;
+            height: 100%;
+            background: #4a90e2;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" style="
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 12px 25px;
+            border-radius: 25px;
+            color: white;
+            text-decoration: none;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;">
+            返回首页
+        </a>
+        
+        <div class="music-player">
+            <div class="now-playing">
+                <div class="song-title">Imagine</div>
+                <div class="artist">John Lennon</div>
+            </div>
+
+            <div class="controls">
+                <button class="control-button">⏮</button>
+                <button class="control-button play-button">▶</button>
+                <button class="control-button">⏭</button>
+            </div>
+
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+            <div class="time">
+                <span>1:23</span>
+                <span>3:45</span>
+            </div>
+
+            <div class="volume-control">
+                <span>🔊</span>
+                <div class="volume-slider">
+                    <div class="volume-level"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="playlist">
+            <h2 class="playlist-title">播放列表</h2>
+            <ul class="song-list">
+                <li class="song-item">
+                    <div class="song-info">
+                        <div class="song-name">Imagine</div>
+                        <div class="song-artist">John Lennon</div>
+                    </div>
+                    <div class="song-duration">3:45</div>
+                </li>
+                <li class="song-item">
+                    <div class="song-info">
+                        <div class="song-name">Yesterday</div>
+                        <div class="song-artist">The Beatles</div>
+                    </div>
+                    <div class="song-duration">2:58</div>
+                </li>
+                <li class="song-item">
+                    <div class="song-info">
+                        <div class="song-name">Let It Be</div>
+                        <div class="song-artist">The Beatles</div>
+                    </div>
+                    <div class="song-duration">4:03</div>
+                </li>
+                <li class="song-item">
+                    <div class="song-info">
+                        <div class="song-name">Hey Jude</div>
+                        <div class="song-artist">The Beatles</div>
+                    </div>
+                    <div class="song-duration">7:11</div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="nav.js"></script>
+    <script>
+        window.onload = function() {
+            initNav();
+            
+            // 播放按钮点击事件
+            const playButton = document.querySelector('.play-button');
+            let isPlaying = false;
+            
+            playButton.addEventListener('click', function() {
+                isPlaying = !isPlaying;
+                this.textContent = isPlaying ? '⏸' : '▶';
+            });
+            
+            // 歌曲列表点击事件
+            const songItems = document.querySelectorAll('.song-item');
+            songItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const songName = this.querySelector('.song-name').textContent;
+                    const artistName = this.querySelector('.song-artist').textContent;
+                    
+                    document.querySelector('.song-title').textContent = songName;
+                    document.querySelector('.artist').textContent = artistName;
+                    
+                    // 重置播放状态
+                    isPlaying = true;
+                    playButton.textContent = '⏸';
+                });
+            });
+        };
+    </script>
+</body>
+</html> 

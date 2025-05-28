@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人主页 - SoloSphere</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            padding-top: 80px;
+        }
+
+        .blog-link {
+            text-align: center;
+            color: white;
+            padding: 40px 20px;
+        }
+
+        .blog-link h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .blog-link p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+
+        .icon-container {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 30px;
+            z-index: 1000;
+        }
+
+        .icon-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .icon-link {
+            width: 60px;
+            height: 60px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-bottom: 8px;
+        }
+
+        .icon-name {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 4px;
+            text-align: center;
+        }
+
+        .icon-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .icon-link img {
+            width: 35px;
+            height: 35px;
+        }
+
+        @keyframes wiggle {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            75% { transform: rotate(10deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .icon-link:hover img {
+            animation: wiggle 0.5s ease;
+        }
+
+        .game-options {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+        }
+
+        .game-option {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: #333;
+            transition: background 0.2s;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .game-option:hover {
+            background: #f0f0f0;
+        }
+
+        .icon-wrapper:hover .game-options {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏会通过JavaScript插入到这里 -->
+    
+    <div class="container">
+        <div class="blog-link">
+            <h2>欢迎来到我的空间</h2>
+            <p>在这里，我分享技术文章和学习心得</p>
+        </div>
+    </div>
+    
+    <div class="icon-container">
+        <div class="icon-wrapper">
+            <a href="/games.html" class="icon-link">
+                <img src="/game-icon.svg" alt="游戏">
+            </a>
+            <span class="icon-name">游戏</span>
+        </div>
+
+        <div class="icon-wrapper">
+            <a href="/music.html" class="icon-link">
+                <img src="/music-icon.svg" alt="音乐">
+            </a>
+            <span class="icon-name">音乐</span>
+        </div>
+
+        <div class="icon-wrapper">
+            <a href="/blog.html" class="icon-link">
+                <img src="/blog-icon.svg" alt="博客">
+            </a>
+            <span class="icon-name">我的博客</span>
+        </div>
+
+        <div class="icon-wrapper">
+            <a href="/life.html" class="icon-link">
+                <img src="/life-icon.svg" alt="生活">
+            </a>
+            <span class="icon-name">日常生活</span>
+        </div>
+    </div>
+
+    <script src="/nav.js"></script>
+    <script>
+        // 初始化导航栏
+        window.onload = function() {
+            initNav();
+        };
+    </script>
+</body>
+</html> 

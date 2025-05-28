@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贪吃蛇 - 多人模式</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            min-width: 400px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .room-container {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .room-info {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .player-list {
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .player-item {
+            padding: 10px;
+            background-color: #f5f5f5;
+            margin: 5px 0;
+            border-radius: 5px;
+        }
+
+        .host-badge {
+            background-color: #4CAF50;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .action-button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+            color: white;
+            font-weight: bold;
+        }
+
+        .create-room {
+            background-color: #9C27B0;
+        }
+
+        .create-room:hover {
+            background-color: #7B1FA2;
+        }
+
+        .join-room {
+            background-color: #2196F3;
+        }
+
+        .join-room:hover {
+            background-color: #1976D2;
+        }
+
+        .start-game {
+            background-color: #4CAF50;
+        }
+
+        .start-game:hover {
+            background-color: #45a049;
+        }
+
+        .start-game:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .exit-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .exit-button:hover {
+            background-color: #d32f2f;
+        }
+
+        #roomCode {
+            font-size: 24px;
+            font-weight: bold;
+            color: #9C27B0;
+        }
+
+        .mode-selection {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            color: #666;
+            margin: 20px 0;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80% { content: '....'; }
+            100% { content: '.....'; }
+        }
+
+        .loading::after {
+            content: '';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>多人模式</h1>
+
+        <!-- 模式选择界面 -->
+        <div class="mode-selection">
+            <div class="button-container">
+                <button class="action-button create-room" onclick="createRoom()">创建房间</button>
+                <button class="action-button join-room" onclick="joinRoom()">加入房间</button>
+            </div>
+        </div>
+
+        <!-- 房间界面 -->
+        <div class="room-container" id="roomContainer">
+            <div class="room-info">
+                房间号：<span id="roomCode">XXXX</span>
+            </div>
+            <div class="player-list" id="playerList">
+                <!-- 玩家列表将通过JavaScript动态添加 -->
+            </div>
+            <div class="button-container">
+                <button class="action-button start-game" id="startGameBtn" onclick="startGame()" disabled>开始游戏</button>
+            </div>
+        </div>
+
+        <!-- 加载提示 -->
+        <div class="loading" id="loading">正在匹配中</div>
+    </div>
+
+    <a href="snake-mode.html" class="exit-button">退出游戏</a>
+
+    <script>
+        let ws = null;
+        let isHost = false;
+        let roomCode = '';
+        let players = [];
+
+        // 连接WebSocket服务器
+        function connectWebSocket() {
+            // 根据当前页面的协议确定WebSocket协议
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.hostname}:8765`;
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = () => {
+                console.log('WebSocket连接已建立');
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket连接已关闭');
+                alert('与服务器的连接已断开，请刷新页面重试');
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket错误:', error);
+                alert('连接服务器失败，请确保服务器已启动');
+            };
+        }
+
+        // 处理WebSocket消息
+        function handleWebSocketMessage(data) {
+            switch(data.type) {
+                case 'create_room':
+                    if (data.success) {
+                        roomCode = data.room_code;
+                        showRoom();
+                        updatePlayerList(data.state);
+                    }
+                    break;
+
+                case 'join_room':
+                    if (data.success) {
+                        showRoom();
+                        updatePlayerList(data.state);
+                    } else {
+                        alert(data.error);
+                    }
+                    break;
+
+                case 'room_update':
+                    updatePlayerList(data.state);
+                    break;
+
+                case 'game_started':
+                    window.location.href = `snake.html?mode=multiplayer&room=${roomCode}`;
+                    break;
+            }
+        }
+
+        // 更新玩家列表
+        function updatePlayerList(state) {
+            const playerList = document.getElementById('playerList');
+            playerList.innerHTML = '';
+            
+            Object.values(state.players).forEach(player => {
+                const playerItem = document.createElement('div');
+                playerItem.className = 'player-item';
+                playerItem.textContent = player.name;
+                
+                if (player.is_host) {
+                    const hostBadge = document.createElement('span');
+                    hostBadge.className = 'host-badge';
+                    hostBadge.textContent = '房主';
+                    playerItem.appendChild(hostBadge);
+                    
+                    // 如果当前玩家是房主，启用开始游戏按钮
+                    if (isHost) {
+                        document.getElementById('startGameBtn').disabled = false;
+                    }
+                }
+                
+                playerList.appendChild(playerItem);
+            });
+        }
+
+        // 创建房间
+        function createRoom() {
+            if (!ws) {
+                connectWebSocket();
+            }
+
+            isHost = true;
+            ws.send(JSON.stringify({
+                type: 'create_room'
+            }));
+        }
+
+        // 加入房间
+        function joinRoom() {
+            if (!ws) {
+                connectWebSocket();
+            }
+
+            const code = prompt('请输入房间号：');
+            if (code) {
+                isHost = false;
+                ws.send(JSON.stringify({
+                    type: 'join_room',
+                    room_code: code
+                }));
+            }
+        }
+
+        // 显示房间
+        function showRoom() {
+            document.querySelector('.mode-selection').style.display = 'none';
+            document.getElementById('roomContainer').style.display = 'block';
+            document.getElementById('roomCode').textContent = roomCode;
+        }
+
+        // 开始游戏
+        function startGame() {
+            if (isHost) {
+                ws.send(JSON.stringify({
+                    type: 'start_game',
+                    room_code: roomCode
+                }));
+            }
+        }
+
+        // 页面加载时连接WebSocket
+        window.onload = () => {
+            connectWebSocket();
+        };
+
+        // 页面关闭时断开WebSocket连接
+        window.onbeforeunload = () => {
+            if (ws) {
+                ws.close();
+            }
+        };
+    </script>
+</body>
+</html> 

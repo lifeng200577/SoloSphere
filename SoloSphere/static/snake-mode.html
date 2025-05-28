@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>选择游戏模式 - SoloSphere</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: #f5f5f5;
+        }
+
+        .main-content {
+            margin-top: 80px;
+            padding: 20px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .mode-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .mode-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .mode-card h2 {
+            color: #4a90e2;
+            margin-bottom: 15px;
+        }
+
+        .mode-card p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .mode-card button {
+            padding: 10px 20px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        .mode-card button:hover {
+            background: #357abd;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏会通过JavaScript插入到这里 -->
+
+    <div class="main-content">
+        <div class="mode-container">
+            <div class="mode-card">
+                <h2>单人模式</h2>
+                <p>经典贪吃蛇游戏，挑战自己的极限！</p>
+                <button onclick="startGame('single')">开始游戏</button>
+            </div>
+
+            <div class="mode-card">
+                <h2>多人模式</h2>
+                <p>与其他玩家一起竞技，看谁能活到最后！</p>
+                <button onclick="startGame('multi')">开始游戏</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/nav.js"></script>
+    <script>
+        // 初始化导航栏
+        window.onload = function() {
+            initNav();
+        };
+
+        function startGame(mode) {
+            if (mode === 'single') {
+                window.location.href = '/snake.html';
+            } else {
+                window.location.href = '/snake-multi.html';
+            }
+        }
+    </script>
+</body>
+</html> 

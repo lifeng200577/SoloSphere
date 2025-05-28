@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博客 - SoloSphere</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: white;
+        }
+
+        .blog-post {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .blog-title {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .blog-meta {
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 15px;
+        }
+
+        .blog-content {
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .blog-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+
+        .action-button:hover {
+            background: #357abd;
+        }
+
+        .new-post-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #4a90e2;
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .new-post-button:hover {
+            transform: translateY(-3px);
+            background: #357abd;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            color: #333;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #4a90e2;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        .form-group textarea {
+            height: 200px;
+            resize: vertical;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+
+        .save-button {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .cancel-button {
+            background: #f5f5f5;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="blog-post">
+            <h2 class="blog-title">我的第一篇博客</h2>
+            <div class="blog-meta">发布于 2024-05-28 · 阅读 123</div>
+            <div class="blog-content">
+                这是我的第一篇博客内容。在这里，我可以分享我的想法、经历和感受。
+                SoloSphere 提供了一个很好的平台，让我能够自由地表达自己。
+            </div>
+            <div class="blog-actions">
+                <button class="action-button">编辑</button>
+                <button class="action-button">删除</button>
+            </div>
+        </div>
+
+        <div class="blog-post">
+            <h2 class="blog-title">学习编程的心得</h2>
+            <div class="blog-meta">发布于 2024-05-27 · 阅读 456</div>
+            <div class="blog-content">
+                今天我学习了Python编程，感觉收获很多。
+                通过实践和练习，我逐渐掌握了基本的编程概念和技巧。
+                希望能够继续坚持学习，不断提升自己的编程能力。
+            </div>
+            <div class="blog-actions">
+                <button class="action-button">编辑</button>
+                <button class="action-button">删除</button>
+            </div>
+        </div>
+    </div>
+
+    <button class="new-post-button" onclick="showNewPostModal()">+</button>
+    
+    <a href="/" style="
+        position: fixed;
+        bottom: 30px;
+        left: 30px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        padding: 12px 25px;
+        border-radius: 25px;
+        color: white;
+        text-decoration: none;
+        font-size: 1.1em;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;">
+        返回首页
+    </a>
+
+    <div class="modal" id="newPostModal">
+        <div class="modal-content">
+            <h2 class="modal-title">写新博客</h2>
+            <div class="form-group">
+                <label>标题</label>
+                <input type="text" id="postTitle" placeholder="请输入博客标题">
+            </div>
+            <div class="form-group">
+                <label>内容</label>
+                <textarea id="postContent" placeholder="请输入博客内容"></textarea>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-button cancel-button" onclick="hideNewPostModal()">取消</button>
+                <button class="modal-button save-button" onclick="saveNewPost()">发布</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="nav.js"></script>
+    <script>
+        window.onload = function() {
+            initNav();
+        };
+
+        function showNewPostModal() {
+            document.getElementById('newPostModal').style.display = 'flex';
+        }
+
+        function hideNewPostModal() {
+            document.getElementById('newPostModal').style.display = 'none';
+        }
+
+        function saveNewPost() {
+            const title = document.getElementById('postTitle').value;
+            const content = document.getElementById('postContent').value;
+            
+            if (!title || !content) {
+                alert('请填写标题和内容');
+                return;
+            }
+
+            // 这里添加保存博客的逻辑
+            
+            hideNewPostModal();
+            alert('博客发布成功！');
+            location.reload();
+        }
+    </script>
+</body>
+</html> 

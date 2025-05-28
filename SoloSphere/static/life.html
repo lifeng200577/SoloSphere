@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生活 - SoloSphere</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-top: 80px;
+        }
+
+        .life-post {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .post-time {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .post-content {
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .add-post-form {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            height: 100px;
+            resize: vertical;
+        }
+
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        button {
+            background: #4a90e2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #357abd;
+        }
+
+        .mood-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .mood-option {
+            padding: 5px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .mood-option.selected {
+            background: #4a90e2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="add-post-form">
+            <h2>记录生活</h2>
+            <form id="addPostForm">
+                <div class="mood-selector" id="moodSelector">
+                    <div class="mood-option" data-mood="开心">开心</div>
+                    <div class="mood-option" data-mood="平静">平静</div>
+                    <div class="mood-option" data-mood="疲惫">疲惫</div>
+                    <div class="mood-option" data-mood="沮丧">沮丧</div>
+                </div>
+                <div class="form-group">
+                    <label for="content">今天想说的话</label>
+                    <textarea id="content" required placeholder="分享你的生活点滴..."></textarea>
+                </div>
+                <button type="submit">发布</button>
+            </form>
+        </div>
+
+        <div id="lifePosts">
+            <!-- 生活记录将通过JavaScript动态加载 -->
+        </div>
+    </div>
+
+    <script src="/nav.js"></script>
+    <script>
+        // 初始化导航栏
+        window.onload = function() {
+            initNav();
+            loadLifePosts();
+            initMoodSelector();
+        };
+
+        // 心情选择器
+        function initMoodSelector() {
+            const moodOptions = document.querySelectorAll('.mood-option');
+            moodOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    moodOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+        }
+
+        // 加载生活记录
+        function loadLifePosts() {
+            fetch('/api/life/posts')
+                .then(response => response.json())
+                .then(data => {
+                    const lifePosts = document.getElementById('lifePosts');
+                    lifePosts.innerHTML = '';
+                    
+                    data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                        .forEach(post => {
+                            const postElement = document.createElement('div');
+                            postElement.className = 'life-post';
+                            postElement.innerHTML = `
+                                <div class="post-header">
+                                    <div class="post-mood">心情：${post.mood || '未知'}</div>
+                                    <div class="post-time">${new Date(post.created_at).toLocaleString()}</div>
+                                </div>
+                                <div class="post-content">${post.content}</div>
+                            `;
+                            lifePosts.appendChild(postElement);
+                        });
+                })
+                .catch(error => console.error('加载生活记录失败:', error));
+        }
+
+        // 添加生活记录
+        document.getElementById('addPostForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const selectedMood = document.querySelector('.mood-option.selected');
+            const postData = {
+                content: document.getElementById('content').value,
+                mood: selectedMood ? selectedMood.dataset.mood : '平静'
+            };
+
+            fetch('/api/life/posts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(postData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.id) {
+                    loadLifePosts();
+                    document.getElementById('addPostForm').reset();
+                    document.querySelectorAll('.mood-option').forEach(opt => opt.classList.remove('selected'));
+                }
+            })
+            .catch(error => console.error('发布生活记录失败:', error));
+        });
+    </script>
+</body>
+</html> 
